@@ -1,0 +1,9 @@
+upstream/.env.example:generic-api-key:8
+upstream/backend/open_webui/env.py:generic-api-key:383
+upstream/backend/open_webui/retrieval/web/testdata/serpstack.json:generic-api-key:26
+upstream/backend/open_webui/storage/provider.py:generic-api-key:133
+upstream/src/lib/emoji-shortcodes.json:generic-api-key:73
+upstream/src/lib/emoji-shortcodes.json:generic-api-key:75
+upstream/static/dsfr.nomodule.min.js.map:generic-api-key:1
+upstream/static/dsfr.nomodule.min.js.map:generic-api-key:1
+upstream/static/dsfr.nomodule.min.js.map:generic-api-key:1
