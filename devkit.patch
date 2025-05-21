@@ -35,7 +35,7 @@ index 000000000..3ffd2798a
 +node="22.15.0"
 diff --git a/README.sklein.md b/README.sklein.md
 new file mode 100644
-index 000000000..3da96b5c7
+index 000000000..ae6958fe8
 --- /dev/null
 +++ b/README.sklein.md
 @@ -0,0 +1,20 @@
@@ -48,7 +48,7 @@ index 000000000..3da96b5c7
 +```sh
 +$ mise install
 +$ npm install # 1.9G installed
-+$ pnpm run dev
++$ pnpm run dev:frontend
 +```
 +
 +Next, open your browser on <http://localhost:5173/>.
