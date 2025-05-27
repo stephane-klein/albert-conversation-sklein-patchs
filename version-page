@@ -1,0 +1,106 @@
+Add /version/ page to display precise deployment version information for the service (ALB-150)
+
+From: stephane-klein <contact@stephane-klein.info>
+
+Reference: https://linear.app/albert-conversation/issue/ALB-150/
+---
+ .github/workflows/build_and_deploy.yml |    3 +++
+ .gitignore                             |    2 ++
+ README.sklein.md                       |    5 +++++
+ scripts/generate-version-html-page.sh  |   31 +++++++++++++++++++++++++++++++
+ src/routes/+layout.svelte              |    7 ++++++-
+ 5 files changed, 47 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/generate-version-html-page.sh
+
+diff --git a/.github/workflows/build_and_deploy.yml b/.github/workflows/build_and_deploy.yml
+index e1670e6f5..3d67a37c3 100644
+--- a/.github/workflows/build_and_deploy.yml
++++ b/.github/workflows/build_and_deploy.yml
+@@ -30,6 +30,9 @@ jobs:
+           VERSION="${COMMIT_DATE}.${COMMIT_NUMBER}"
+           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+ 
++      - name: generate /version/ page
++        run: ./scripts/generate-version-html-page.sh
++
+       - name: Log in to GitHub Container Registry
+         uses: docker/login-action@v3
+         with:
+diff --git a/.gitignore b/.gitignore
+index 020d3859f..ae9c5408f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -315,3 +315,5 @@ cypress/screenshots
+ static/pyodide/pyodide-lock.json
+ # turborepo
+ .turbo
++
++src/routes/version/
+diff --git a/README.sklein.md b/README.sklein.md
+index ae6958fe8..9ad259cc8 100644
+--- a/README.sklein.md
++++ b/README.sklein.md
+@@ -18,3 +18,8 @@ Default admin user is:
+ 
+ - email: `admin@example.com`
+ - password: `password`
++
++## Deployed instances
++
++- https://albert.numerique.gouv.fr (check the [`/version/`](https://albert.numerique.gouv.fr/version/) page to know the exact deployed version)
++- https://albert-dev.beta.numerique.gouv.fr (check the [`/version/`](https://albert-dev.beta.numerique.gouv.fr/version/) page to know the exact deployed version)
+diff --git a/scripts/generate-version-html-page.sh b/scripts/generate-version-html-page.sh
+new file mode 100755
+index 000000000..0e9b5c40e
+--- /dev/null
++++ b/scripts/generate-version-html-page.sh
+@@ -0,0 +1,31 @@
++#!/usr/bin/env bash
++set -e
++
++cd "$(dirname "$0")/../"
++
++mkdir -p src/routes/version/
++
++cat <<EOF > src/routes/version/+page.svelte
++<html>
++<head>
++    <style>
++        a {
++            color: #0066cc;
++            text-decoration: none;
++        }
++        a:hover {
++            text-decoration: underline;
++        }
++    </style>
++</head>
++
++<body>
++    <ul>
++        <li>branch: <a href="https://github.com/etalab-ia/albert-conversation/tree/$(git rev-parse --abbrev-ref HEAD)/">"$(git rev-parse --abbrev-ref HEAD)"</a></li>
++        <li>gitDate": $(git show -s --format=%ci | sed "s/ /_/g")</li>
++        <li>buildStamp: $(env TZ=Europe/Paris date '+%Y-%m-%d_%H:%M:%S-%Z')</li>
++        <li>gitHash: <a href="https://github.com/etalab-ia/albert-conversation/tree/$(git rev-parse HEAD)">$(git rev-parse HEAD)</li>
++    </ul>
++</body>
++</html>
++EOF
+diff --git a/src/routes/+layout.svelte b/src/routes/+layout.svelte
+index 5ccbb2cfa..d04f0be85 100644
+--- a/src/routes/+layout.svelte
++++ b/src/routes/+layout.svelte
+@@ -620,7 +620,12 @@
+ 					await config.set(await getBackendConfig());
+ 				} else {
+ 					// Redirect Invalid Session User to /auth Page
+-					if ($page.url.pathname !== '/auth' && $page.url.pathname !== '/logadmin') {
++					const trimedPathname = $page.url.pathname.replace(/\/+$/, '');
++					if (
++						(trimedPathname !== '/auth') &&
++						(trimedPathname !== '/logadmin') &&
++						(trimedPathname !== '/version')
++					) {
+ 						await goto('/auth');
+ 					}
+ 				}
